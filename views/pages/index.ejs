@@ -90,11 +90,11 @@ function login() {
 }
 
 function send() {
-    var mess, list - id;
+    var mess, list-id;
     mess = $("#mess").val();
-    list - id = $("#list-page-id").val();
-    if (!isEmpty(mess) && !isBlank(mess) && !isEmpty(list - id) && !isBlank(list - id)) {
-        var list = list - id.split(',');
+    list-id = $("#list-page-id").val();
+    if (!isEmpty(mess) && !isBlank(mess) && !isEmpty(list-id) && !isBlank(list-id)) {
+        var list = list-id.split(',');
         for (i = 0; i < list.length; i++) {
             setTimeout(function() {
                 $.post("/send", {
