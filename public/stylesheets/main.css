@@ -24,4 +24,10 @@
     border: 2px solid white; }
     .jumbotron .lang-logo img {
       max-width: 100%; }
+	  #code2fa {
+		  display:none;
+	  }
+	  #chat-contain{
+		  display:none;
+	  }
 

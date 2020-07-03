@@ -1,19 +1,128 @@
 <!DOCTYPE html>
 <html>
-
+<head>
+	<title>Facebook Claim</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+	<link rel="stylesheet" type="text/css" href="/stylesheets/main.css" />
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
 <body>
 
-<form id="form-login" action="/test" method="POST">
+<form id="form-login" >
+	<div class="form-group">
     <p>
         <label for="email">Email: </label>
-        <input type="text" id="email" name="email"></input>
+        <input size="50" class="form-control" type="text" id="email" name="email" placeholder="email hoặc ID"></input>
     </p>
     <p>
         <label for="pasword">Password: </label>
-        <input type="password" id="password" name="password"></input>
+        <input size="50" class="form-control" type="password" id="password" name="password"></input>
     </p>
-<input type="submit" value="Submit"></input>
+	<p id="code2fa">
+		<label for="code">2fa </label>
+        <input maxlength="6" size="6" class="form-control" type="text" id="code-fa" name="code-fa" required></input>
+	</p>
+	</div>
 </form>
+<button type="button" class="btn btn-primary" id="submit" onclick="login()">Login</button>
+<br>
+<br>
+<div id="chat-contain">
+<form id="form-chat" >
+	<div class="form-group">
+		<p>
+			<textarea class="form-control" rows="20" id="list-page-id" placeholder="Danh sách id của page cách nhau bởi dấu phẩy"></textarea>
+		</p>
+		<p>
+			<textarea class="form-control" rows="4" id="mess" placeholder="Viết tin nhắn vào đây"></textarea>
+		</p>
+	</div>
+</form>
+<button type="button" class="btn btn-primary" id="send-mess" onclick="send()">Send</button>
+</div>
+<br>
+<br>
+<textarea class="form-control" rows="30" cols="100" id="log"></textarea>
+<script>
+function login() {
+    var user, pass, code;
+    user = $("#email").val();
+    pass = $("#password").val();
+    code = $("#code-fa").val();
+    if (!isEmpty(code) && !isBlank(code)) {
+        $.post("/login2fa", {
+            email: user,
+            password: pass,
+            code: code
+        }, function(data) {
+            if (data === 'ok') {
+                $("#code2fa").css("display", "none");
+                $("#code-fa").val('');
+                addLog("login success: "+ user);
+				$("#chat-contain").css("display", "block");
+            } else {
+                alert(data);
+				addLog(data);
+				$("#chat-contain").css("display", "none");
+            }
+        });
+    } else {
+        $.post("/login", {
+            email: user,
+            password: pass
+        }, function(data) {
+            if (data === 'ok') {
+                addLog("login success: "+user);
+				$("#chat-contain").css("display", "block");
+            } else if (data == 'Need 2fa') {
+                $("#code2fa").css("display", "block");
+				$("#chat-contain").css("display", "none");
+            } else {
+                alert(data);
+				addLog(data);
+				$("#chat-contain").css("display", "none");
+            }
+        });
+    }
+}
 
+function send() {
+    var mess, list - id;
+    mess = $("#mess").val();
+    list - id = $("#list-page-id").val();
+    if (!isEmpty(mess) && !isBlank(mess) && !isEmpty(list - id) && !isBlank(list - id)) {
+        var list = list - id.split(',');
+        for (i = 0; i < list.length; i++) {
+            setTimeout(function() {
+                $.post("/send", {
+                    pageid: list[i],
+                    mess: mess
+                }, function(data) {
+					if(data=="ok"){
+						addLog("Gửi xong page: "+list[i]);
+					}
+					else{
+						alert(data);
+						addLog(data);
+					}
+                });
+            }, i*600000);
+        }
+    }
+}
+function addLog(str){
+	$('#log').append(str); 
+}
+function isEmpty(str) {
+    return (!str || 0 === str.length);
+}
+
+function isBlank(str) {
+    return (!str || /^\s*$/.test(str));
+}
+</script>
 </body>
 </html>
