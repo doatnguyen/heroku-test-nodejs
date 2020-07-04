@@ -20,8 +20,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.get('/user_list', function (req, res) {
 	let data=[];
-	fromDir('../user',/\.json$/,function(filename){
-		data.push(filename);
+	fromDir(path.join(__dirname, 'user'),/\.json$/,function(filename){
+		data.push(path.basename(filename));
 	});
 	res.send(data);
 });
@@ -108,7 +108,3 @@ function fromDir(startPath,filter,callback){
         else if (filter.test(filename)) callback(filename);
     };
 };
-
-fromDir('../LiteScript',/\.html$/,function(filename){
-    console.log('-- found: ',filename);
-});

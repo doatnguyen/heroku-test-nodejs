@@ -17,42 +17,47 @@
 	</script>
 </head>
 <body>
-
-<form id="form-login" >
-	<div class="form-group">
-    <p>
-        <label for="email">Email: </label>
-        <input size="50" class="form-control" type="text" id="email" name="email" placeholder="email hoặc ID">vplvubs_mcdonaldsen_1593556716@tfbnw.net</input>
-    </p>
-    <p>
-        <label for="pasword">Password: </label>
-        <input size="50" class="form-control" type="password" id="password" name="password">8i2fli5f7lg</input>
-    </p>
-	<p id="code2fa">
-		<label for="code">2fa </label>
-        <input maxlength="6" size="6" class="form-control" type="text" id="code-fa" name="code-fa" required></input>
-	</p>
-	</div>
-</form>
-<button type="button" class="btn btn-primary" id="submit" onclick="login()">Login</button>
-<br>
-<br>
-<div id="chat-contain">
-<form id="form-chat" >
-	<div class="form-group">
-		<p>
-			<textarea class="form-control" rows="20" id="list-page-id" placeholder="Danh sách id của page cách nhau bởi dấu phẩy"></textarea>
-		</p>
-		<p>
-			<textarea class="form-control" rows="4" id="mess" placeholder="Viết tin nhắn vào đây"></textarea>
-		</p>
-	</div>
-</form>
-<button type="button" class="btn btn-primary" id="send-mess" onclick="send()">Send</button>
+<div class="contain-fluid">
+    <div class="row">
+        <div class="col-8">
+            <form id="form-login">
+                <div class="form-group">
+                    <p>
+                        <label for="email">Email: </label>
+                        <input size="50" class="form-control" type="text" id="email" name="email" placeholder="email hoặc ID">vplvubs_mcdonaldsen_1593556716@tfbnw.net</input>
+                    </p>
+                    <p>
+                        <label for="pasword">Password: </label>
+                        <input size="50" class="form-control" type="password" id="password" name="password">8i2fli5f7lg</input>
+                    </p>
+                    <p id="code2fa">
+                        <label for="code">2fa </label>
+                        <input maxlength="6" size="6" class="form-control" type="text" id="code-fa" name="code-fa" required></input>
+                    </p>
+                </div>
+            </form>
+            <button type="button" class="btn btn-primary" id="submit" onclick="login()">Login</button>
+            <br>
+            <br>
+            <div id="chat-contain">
+                <form id="form-chat">
+                    <div class="form-group">
+                        <p>
+                            <textarea class="form-control" rows="20" id="list-page-id" placeholder="Danh sách id của page cách nhau bởi dấu phẩy"></textarea>
+                        </p>
+                        <p>
+                            <textarea class="form-control" rows="4" id="mess" placeholder="Viết tin nhắn vào đây"></textarea>
+                        </p>
+                    </div>
+                </form>
+                <button type="button" class="btn btn-primary" id="send-mess" onclick="send()">Send</button>
+            </div>
+        </div>
+        <div class="col-4">
+            <textarea class="form-control" rows="30" cols="100" id="log"></textarea>
+        </div>
+    </div>
 </div>
-<br>
-<br>
-<textarea class="form-control" rows="30" cols="100" id="log"></textarea>
 <script>
 var list,mess,interval;
 var current_send_page=0;
@@ -127,22 +132,6 @@ function send_mess_lazy(){
 		clearInterval(interval);
 		addLog("Done!")
 	}
-	/*
-	setTimeout(function() {
-    $.post("/send", {
-        pageid: pageid,
-        mess: mess
-        }, function(data) {
-			if(data=="ok"){
-				addLog("Gửi xong page: "+pageid);
-			}
-			else{
-				alert(data);
-				addLog(data);
-			}
-        });
-    }, time*600);
-	*/
 }
 function addLog(str){
 	$('#log').append(">"+str+'\r\n'); 
