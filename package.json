@@ -8,7 +8,6 @@
   "main": "index.js",
   "scripts": {
 	"preinstall": "npm install facebook-chat-api",
-	"preinstall": "npm install findit",
     "start": "node index.js",
     "test": "node test.js"
   },
