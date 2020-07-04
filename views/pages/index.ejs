@@ -47,6 +47,8 @@
 <br>
 <textarea class="form-control" rows="30" cols="100" id="log"></textarea>
 <script>
+var list,mess,interval;
+var current_send_page=0;
 function login() {
     var user, pass, code;
     user = $("#email").val();
@@ -90,28 +92,47 @@ function login() {
 }
 
 function send() {
-    var mess, list_id;
+    var list_id;
     mess = $("#mess").val();
     list_id = $("#list-page-id").val();
     if (!isEmpty(mess) && !isBlank(mess) && !isEmpty(list_id) && !isBlank(list_id)) {
-        var list = list_id.split(',');
-        for (i = 0; i < list.length; i++) {
-            setTimeout(function() {
-                $.post("/send", {
-                    pageid: list[i],
-                    mess: mess
-                }, function(data) {
-					if(data=="ok"){
-						addLog("Gửi xong page: "+list[i]);
-					}
-					else{
-						alert(data);
-						addLog(data);
-					}
-                });
-            }, i*600000);
-        }
+		list = list_id.split(',');
     }
+	interval = setInterval(send_mess_lazy, 600000);
+}
+function send_mess_lazy(){
+	if(current_send_page<list.length){
+		$.post("/send", {
+			pageid: list[current_send_page],
+			mess: mess
+			}, function(data) {
+				if(data=="ok"){
+					addLog("Gửi xong page: "+list[current_send_page]);
+				}
+				else{
+					alert(data);
+					addLog(data);
+				}
+			}
+        );
+		current_send_page++;
+	}
+	/*
+	setTimeout(function() {
+    $.post("/send", {
+        pageid: pageid,
+        mess: mess
+        }, function(data) {
+			if(data=="ok"){
+				addLog("Gửi xong page: "+pageid);
+			}
+			else{
+				alert(data);
+				addLog(data);
+			}
+        });
+    }, time*600);
+	*/
 }
 function addLog(str){
 	$('#log').append(">"+str+'\r\n'); 
