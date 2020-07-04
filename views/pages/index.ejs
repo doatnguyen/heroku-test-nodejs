@@ -116,6 +116,9 @@ function send_mess_lazy(){
 			}
         );
 		current_send_page++;
+	}else {
+		clearInterval(interval);
+		addLog("Done!")
 	}
 	/*
 	setTimeout(function() {
