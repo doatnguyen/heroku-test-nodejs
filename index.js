@@ -58,7 +58,7 @@ app.post('/login2fa', function (req, res) {
   var body = req.body;
   email= body.email;
   password= body.password;
-  var code = body.code-fa;
+  var code = body.code;
   var credentials = {email: email, password: password};
   console.log(credentials);
   login(credentials, (err, api) => {
