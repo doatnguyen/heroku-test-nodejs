@@ -8,6 +8,13 @@
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 	<link rel="stylesheet" type="text/css" href="/stylesheets/main.css" />
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://apis.google.com/js/api:client.js"></script>
+	<script src="https://apis.google.com/js/platform.js"></script>
+	<script src="/js/google.js"></script>
+	<script async defer src="https://apis.google.com/js/api.js"
+      onload="this.onload=function(){};handleClientLoad()"
+      onreadystatechange="if (this.readyState === 'complete') this.onload()">
+    </script>
 	<script>
 		$( document ).ready(function() {
 			$.get("/user_list", function(data, status){
@@ -17,7 +24,7 @@
 	</script>
 </head>
 <body>
-<div class="contain-fluid">
+<div class="m-5 pb-5 contain-fluid">
     <div class="row">
         <div class="col-8">
             <form id="form-login">
@@ -32,7 +39,7 @@
                     </p>
                     <p id="code2fa">
                         <label for="code">2fa </label>
-                        <input maxlength="6" size="6" class="form-control" type="text" id="code-fa" name="code-fa" required></input>
+                        <input maxlength="6" size="6" class="form-control" type="number" id="code-fa" name="code-fa" required></input>
                     </p>
                 </div>
             </form>
@@ -40,14 +47,37 @@
             <br>
             <br>
             <div id="chat-contain">
+				<p>		
+					<span class="badge badge-success">Sử dụng GoogleSheet</span>
+					<br>
+						<form id="form-sheet-data">
+							<div class="col-12">
+								<input class="form-control" type="text" id="sheetID" name="sheetID" placeholder="ID của sheet"></input>
+							</div>
+							<div class="col-8">
+								<input class="form-control" type="text" id="sheet_page" name="sheet_page" placeholder="Tên trang : cột cần lấy"></input>
+							</div>
+						</form>
+						<div class="col-2"><button button type="button" class="btn btn-outline-secondary" onclick="readSheet()">Get Data</button></div>
+					<br>
+					<button class="btn btn-primary" onclick="handleSignInClick()">Sign in</button>
+					<button class="btn btn-primary" onclick="handleSignOutClick()">Sign out</button>
+				</p>
                 <form id="form-chat">
                     <div class="form-group">
+						<span class="badge badge-success">Danh sách PageID</span>
                         <p>
-                            <textarea class="form-control" rows="20" id="list-page-id" placeholder="Danh sách id của page cách nhau bởi dấu phẩy"></textarea>
+                            <textarea class="form-control" rows="20" id="list-page-id" placeholder="Danh sách id của page cách nhau bởi xuống dòng"></textarea>
                         </p>
+						<span class="badge badge-success">Tin nhắn</span>
                         <p>
                             <textarea class="form-control" rows="4" id="mess" placeholder="Viết tin nhắn vào đây"></textarea>
                         </p>
+						<span class="badge badge-warning">Thời gian giữa các lần gửi</span>
+						<p>
+							<input maxlength="6" size="50" class="form-control" placeholder="Tính theo giây" type="number" id="time" name="time" required></input>
+							<span class="badge badge-warning">S</span>
+						</p>
                     </div>
                 </form>
                 <button type="button" class="btn btn-primary" id="send-mess" onclick="send()">Send</button>
@@ -106,11 +136,14 @@ function login() {
 function send() {
     var list_id;
     mess = $("#mess").val();
+	var time= $("#time").val();
     list_id = $("#list-page-id").val();
     if (!isEmpty(mess) && !isBlank(mess) && !isEmpty(list_id) && !isBlank(list_id)) {
-		list = list_id.split(',');
+		list = list_id.split('\n');
+		console.log(list);
+		current_send_page=0;
+		interval = setInterval(send_mess_lazy, time*1000);
     }
-	interval = setInterval(send_mess_lazy, 3000);
 }
 function send_mess_lazy(){
 	if(current_send_page<list.length){
@@ -119,7 +152,7 @@ function send_mess_lazy(){
 			mess: mess
 			}, function(data) {
 				if(data=="ok"){
-					addLog("Gửi xong page: "+list[current_send_page]);
+					addLog("Gửi xong page: "+list[current_send_page-1]);
 				}
 				else{
 					alert(data);
@@ -135,6 +168,9 @@ function send_mess_lazy(){
 }
 function addLog(str){
 	$('#log').append(">"+str+'\r\n'); 
+}
+function addPageId(str){
+	$('#list-page-id').append(str+'\r\n');
 }
 function isEmpty(str) {
     return (!str || 0 === str.length);
