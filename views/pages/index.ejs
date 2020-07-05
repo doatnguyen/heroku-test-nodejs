@@ -31,11 +31,11 @@
                 <div class="form-group">
                     <p>
                         <label for="email">Email: </label>
-                        <input size="50" class="form-control" type="text" id="email" name="email" placeholder="email hoặc ID">vplvubs_mcdonaldsen_1593556716@tfbnw.net</input>
+                        <input size="50" class="form-control" type="text" id="email" name="email" placeholder="email hoặc ID">vltfdje_liwitz_1593963586@tfbnw.net</input>
                     </p>
                     <p>
                         <label for="pasword">Password: </label>
-                        <input size="50" class="form-control" type="password" id="password" name="password">8i2fli5f7lg</input>
+                        <input size="50" class="form-control" type="password" id="password" name="password">8j301qqvaan</input>
                     </p>
                     <p id="code2fa">
                         <label for="code">2fa </label>
@@ -65,18 +65,27 @@
 				</p>
                 <form id="form-chat">
                     <div class="form-group">
-						<span class="badge badge-success">Danh sách PageID</span>
+						<div class="col-12 offset-3">
+							<span class="alert-primary">Danh sách PageID</span>
+						</div>
                         <p>
                             <textarea class="form-control" rows="20" id="list-page-id" placeholder="Danh sách id của page cách nhau bởi xuống dòng"></textarea>
                         </p>
-						<span class="badge badge-success">Tin nhắn</span>
+						<div class="col-md-3 offset-md-3">
+							<span class="alert-primary">Tin nhắn</span>
+						</div>
                         <p>
                             <textarea class="form-control" rows="4" id="mess" placeholder="Viết tin nhắn vào đây"></textarea>
                         </p>
-						<span class="badge badge-warning">Thời gian giữa các lần gửi</span>
+						<span class="alert-warning">Thời gian giữa các lần gửi (s)</span>
 						<p>
-							<div class="col-8">
-								<input maxlength="6" size="50" value="60000" class="form-control" placeholder="Tính theo giây" type="number" id="time" name="time" required></input>
+							<div class="row">
+								<div class="col-4">
+									<input maxlength="6" size="50" value="60" class="form-control" placeholder="Tính theo giây" type="number" id="time" name="time" required></input>
+								</div>
+								<div class="col-4">
+									<span class="badge badge-light"> Giây</span>
+								</div>
 							</div>
 						</p>
                     </div>
@@ -85,29 +94,34 @@
             </div>
         </div>
         <div class="col-4">
-            <textarea class="form-control" rows="30" cols="100" id="log"></textarea>
-        </div>
+			<span class="alert-primary">Log</span>
+            <textarea readonly class="form-control" rows="30" cols="100" id="log"></textarea>
+			<div id="counter-time">
+				<span class="alert-primary">Timer</span>
+				<div class="col-8 alert-dark" id="counter"></div>
+			</div>
+		</div>
+		
     </div>
 </div>
 <script>
-var list,mess,interval;
+var list,mess,interval,time;
 var current_send_page=0;
 function login() {
     var user, pass, code;
     user = $("#email").val();
     pass = $("#password").val();
     code = $("#code-fa").val();
-	$("#login").unbind("click",login);
-	$("#login").text("Logging..");
+	stopLoginButton();
+	addLog("Đang đăng nhập");
     if (!isEmpty(code) && !isBlank(code)) {
         $.post("/login2fa", {
             email: user,
             password: pass,
             code: code
         }, function(data) {
-			$("#login").bind("click",login);
-			$("#login").text("Login");
-            if (data === 'ok') {
+			liveLoginButton();	
+			if (data === 'ok') {
                 $("#code2fa").css("display", "none");
                 $("#code-fa").val('');
                 addLog("login success: "+ user);
@@ -123,8 +137,7 @@ function login() {
             email: user,
             password: pass
         }, function(data) {
-			$("#login").bind("click",login);
-			$("#login").text("Login");
+			liveLoginButton();
             if (data === 'ok') {
                 addLog("login success: "+user);
 				$("#chat-contain").css("display", "block");
@@ -132,7 +145,6 @@ function login() {
                 $("#code2fa").css("display", "block");
 				$("#chat-contain").css("display", "none");
 				addLog("Nhập mã 2fa");
-				$("#login").bind("click",login);
 				$("#login").text("Login 2fa");
 				return;
             } else {
@@ -147,20 +159,30 @@ function login() {
 function send() {
     var list_id;
     mess = $("#mess").val();
-	var time= $("#time").val();
+	time= $("#time").val();
+	if(isDay(time)){
+		addLog("Thời gian chờ quá dài!!");
+		return;
+	}
     list_id = $("#list-page-id").val();
     if (!isEmpty(mess) && !isBlank(mess) && !isEmpty(list_id) && !isBlank(list_id)) {
 		list = list_id.split('\n');
-		$("#send-mess").bind("click",send);
-		$("#send-mess").text("Sending...");
+		stopSendButton();
+		addLog("Đang gửi: "+list.length+" page");
+		$("#counter-time").css("display", "block");
 		current_send_page=0;
+		send_mess_lazy();
 		interval = setInterval(send_mess_lazy, time*1000);
     }
+	else{
+		addLog("Vui lòng điền thêm thông tin!");
+	}
 }
 function send_mess_lazy(){
 	if(current_send_page<list.length){
+		setTimer();
 		$.post("/send", {
-			pageid: list[current_send_page],
+			pageid: list[current_send_page].replace(/\s/g, ""),
 			mess: mess
 			}, function(data) {
 				if(data=="ok"){
@@ -175,10 +197,27 @@ function send_mess_lazy(){
 		current_send_page++;
 	}else {
 		clearInterval(interval);
-		$("#send-mess").bind("click",send);
-		$("#send-mess").text("Send");
+		$("#counter-time").css("display", "none");
+		liveSendButton();
 		addLog("Done!")
 	}
+}
+function setTimer() {
+	if(current_send_page) return;
+    var countDownDate = new Date().getTime() + time*1000;
+    var x = setInterval(function() {
+        var now = new Date().getTime();
+        var distance = countDownDate - now;
+        var hours = Math.floor((distance %(1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((distance %(1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance %(1000 * 60)) / 1000);
+        document.getElementById("counter").innerHTML = hours + "h " +
+            minutes + "m " + seconds + "s ";
+        if (distance < 0) {
+            clearInterval(x);
+            document.getElementById("counter").innerHTML = "Chờ gửi";
+        }
+    }, 1000);
 }
 function addLog(str){
 	$('#log').append(">"+str+'\r\n'); 
@@ -189,9 +228,30 @@ function addPageId(str){
 function isEmpty(str) {
     return (!str || 0 === str.length);
 }
-
+function removeSpace(str){
+	return str.replace(/\s/g, "");
+}
 function isBlank(str) {
     return (!str || /^\s*$/.test(str));
+}
+function isDay(time){
+	return (86400/time)<1;
+}
+function stopLoginButton(){
+	$("body" ).off( "click", "#login", login);
+	$("#login").text("Loging...");
+}
+function stopSendButton(){
+	$( "body" ).off( "click", "#send-mess",send );
+	$("#send-mess").text("Sending...");
+}
+function liveLoginButton(){
+	$("body" ).on( "click", "#login", login);
+	$("#login").text("Login");
+}
+function liveSendButton(){
+	$( "body" ).on( "click", "#send-mess",send );
+	$("#send-mess").text("Send");
 }
 </script>
 </body>
