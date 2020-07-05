@@ -76,7 +76,7 @@
 						<span class="badge badge-warning">Thời gian giữa các lần gửi</span>
 						<p>
 							<div class="col-8">
-								<input maxlength="6" size="50" class="form-control" placeholder="Tính theo giây" type="number" id="time" name="time" required></input>
+								<input maxlength="6" size="50" value="60000" class="form-control" placeholder="Tính theo giây" type="number" id="time" name="time" required></input>
 							</div>
 						</p>
                     </div>
@@ -97,20 +97,22 @@ function login() {
     user = $("#email").val();
     pass = $("#password").val();
     code = $("#code-fa").val();
+	$("#login").unbind("click",login);
+	$("#login").text("Logging..");
     if (!isEmpty(code) && !isBlank(code)) {
         $.post("/login2fa", {
             email: user,
             password: pass,
             code: code
         }, function(data) {
+			$("#login").bind("click",login);
+			$("#login").text("Login");
             if (data === 'ok') {
                 $("#code2fa").css("display", "none");
                 $("#code-fa").val('');
                 addLog("login success: "+ user);
 				$("#chat-contain").css("display", "block");
-				$("login" ).prop( "disabled", true );
             } else {
-				$("login" ).prop( "disabled", false );
                 alert("Vui lòng phê duyệt đăng nhập trên trình duyệt khác");
 				addLog("Mã 2fa sai hoặc cần phê duyệt đăng nhập");
 				$("#chat-contain").css("display", "none");
@@ -121,17 +123,19 @@ function login() {
             email: user,
             password: pass
         }, function(data) {
+			$("#login").bind("click",login);
+			$("#login").text("Login");
             if (data === 'ok') {
                 addLog("login success: "+user);
 				$("#chat-contain").css("display", "block");
-				$( "login" ).prop( "disabled", true );
             } else if (data == 'Need 2fa') {
-				$( "login" ).prop( "disabled", false );
                 $("#code2fa").css("display", "block");
 				$("#chat-contain").css("display", "none");
 				addLog("Nhập mã 2fa");
+				$("#login").bind("click",login);
+				$("#login").text("Login 2fa");
+				return;
             } else {
-				$( "login" ).prop( "disabled", false );
                 alert("Tài khoản hoặc mật khẩu sai");
 				addLog("Tài khoản hoặc mật khẩu sai");
 				$("#chat-contain").css("display", "none");
@@ -147,14 +151,11 @@ function send() {
     list_id = $("#list-page-id").val();
     if (!isEmpty(mess) && !isBlank(mess) && !isEmpty(list_id) && !isBlank(list_id)) {
 		list = list_id.split('\n');
-		console.log(list);
+		$("#send-mess").bind("click",send);
+		$("#send-mess").text("Sending...");
 		current_send_page=0;
 		interval = setInterval(send_mess_lazy, time*1000);
-		$("send-mess" ).prop( "disabled", true );
     }
-	else{
-		$("send-mess" ).prop( "disabled", false );
-	}
 }
 function send_mess_lazy(){
 	if(current_send_page<list.length){
@@ -174,7 +175,8 @@ function send_mess_lazy(){
 		current_send_page++;
 	}else {
 		clearInterval(interval);
-		$( "send-mess" ).prop( "disabled", false );
+		$("#send-mess").bind("click",send);
+		$("#send-mess").text("Send");
 		addLog("Done!")
 	}
 }
