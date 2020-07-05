@@ -84,7 +84,7 @@
 									<input maxlength="6" size="50" value="60" class="form-control" placeholder="Tính theo giây" type="number" id="time" name="time" required></input>
 								</div>
 								<div class="col-4">
-									<span class="badge badge-light"> Giây</span>
+									<span class="badge badge-light">Giây</span>
 								</div>
 							</div>
 						</p>
@@ -238,19 +238,19 @@ function isDay(time){
 	return (86400/time)<1;
 }
 function stopLoginButton(){
-	$("body" ).off( "click", "#login", login);
+	$("#login").prop('disabled',true); 
 	$("#login").text("Loging...");
 }
 function stopSendButton(){
-	$( "body" ).off( "click", "#send-mess",send );
+	$("#send-mess").prop('disabled',true);
 	$("#send-mess").text("Sending...");
 }
 function liveLoginButton(){
-	$("body" ).on( "click", "#login", login);
+	$("#login").prop('disabled',false);
 	$("#login").text("Login");
 }
 function liveSendButton(){
-	$( "body" ).on( "click", "#send-mess",send );
+	$("#send-mess").prop('disabled',false);
 	$("#send-mess").text("Send");
 }
 </script>
