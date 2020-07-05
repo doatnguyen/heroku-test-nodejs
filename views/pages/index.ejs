@@ -18,7 +18,7 @@
 	<script>
 		$( document ).ready(function() {
 			$.get("/user_list", function(data, status){
-				alert("Data: " + data + "\nStatus: " + status);
+				//alert("Data: " + data + "\nStatus: " + status);
 			});
 		});
 	</script>
@@ -43,7 +43,7 @@
                     </p>
                 </div>
             </form>
-            <button type="button" class="btn btn-primary" id="submit" onclick="login()">Login</button>
+            <button type="button" class="btn btn-primary" id="login" onclick="login()">Login</button>
             <br>
             <br>
             <div id="chat-contain">
@@ -52,10 +52,10 @@
 					<br>
 						<form id="form-sheet-data">
 							<div class="col-12">
-								<input class="form-control" type="text" id="sheetID" name="sheetID" placeholder="ID của sheet"></input>
+								<input class="form-control" value="1GBgZ37ilREkT5uvSnJveJrX5_VgRTEWzMGuTlpuUaeA"type="text" id="sheetID" name="sheetID" placeholder="ID của sheet"></input>
 							</div>
 							<div class="col-8">
-								<input class="form-control" type="text" id="sheet_page" name="sheet_page" placeholder="Tên trang : cột cần lấy"></input>
+								<input class="form-control" value="data!A:A"type="text" id="sheet_page" name="sheet_page" placeholder="Tên trang : cột cần lấy"></input>
 							</div>
 						</form>
 						<div class="col-2"><button button type="button" class="btn btn-outline-secondary" onclick="readSheet()">Get Data</button></div>
@@ -75,8 +75,9 @@
                         </p>
 						<span class="badge badge-warning">Thời gian giữa các lần gửi</span>
 						<p>
-							<input maxlength="6" size="50" class="form-control" placeholder="Tính theo giây" type="number" id="time" name="time" required></input>
-							<span class="badge badge-warning">S</span>
+							<div class="col-8">
+								<input maxlength="6" size="50" class="form-control" placeholder="Tính theo giây" type="number" id="time" name="time" required></input>
+							</div>
 						</p>
                     </div>
                 </form>
@@ -107,9 +108,11 @@ function login() {
                 $("#code-fa").val('');
                 addLog("login success: "+ user);
 				$("#chat-contain").css("display", "block");
+				$("login" ).prop( "disabled", true );
             } else {
-                alert("Tài khoản hoặc mật khẩu sai");
-				addLog("Tài khoản hoặc mật khẩu sai");
+				$("login" ).prop( "disabled", false );
+                alert("Vui lòng phê duyệt đăng nhập trên trình duyệt khác");
+				addLog("Mã 2fa sai hoặc cần phê duyệt đăng nhập");
 				$("#chat-contain").css("display", "none");
             }
         });
@@ -121,10 +124,14 @@ function login() {
             if (data === 'ok') {
                 addLog("login success: "+user);
 				$("#chat-contain").css("display", "block");
+				$( "login" ).prop( "disabled", true );
             } else if (data == 'Need 2fa') {
+				$( "login" ).prop( "disabled", false );
                 $("#code2fa").css("display", "block");
 				$("#chat-contain").css("display", "none");
+				addLog("Nhập mã 2fa");
             } else {
+				$( "login" ).prop( "disabled", false );
                 alert("Tài khoản hoặc mật khẩu sai");
 				addLog("Tài khoản hoặc mật khẩu sai");
 				$("#chat-contain").css("display", "none");
@@ -143,7 +150,11 @@ function send() {
 		console.log(list);
 		current_send_page=0;
 		interval = setInterval(send_mess_lazy, time*1000);
+		$("send-mess" ).prop( "disabled", true );
     }
+	else{
+		$("send-mess" ).prop( "disabled", false );
+	}
 }
 function send_mess_lazy(){
 	if(current_send_page<list.length){
@@ -163,6 +174,7 @@ function send_mess_lazy(){
 		current_send_page++;
 	}else {
 		clearInterval(interval);
+		$( "send-mess" ).prop( "disabled", false );
 		addLog("Done!")
 	}
 }
