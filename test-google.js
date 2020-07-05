@@ -1,9 +1,11 @@
 const fs = require('fs');
 const readline = require('readline');
 const {google} = require('googleapis');
-
+const path = require('path');
 // If modifying these scopes, delete token.json.
-const SCOPES = ['https://www.googleapis.com/auth/drive.file'];
+const SCOPES = ['https://www.googleapis.com/auth/drive',
+    'https://www.googleapis.com/auth/drive.file',
+    'https://www.googleapis.com/auth/drive.metadata'];
 // The file token.json stores the user's access and refresh tokens, and is
 // created automatically when the authorization flow completes for the first
 // time.
@@ -13,7 +15,7 @@ const TOKEN_PATH = 'token.json';
 fs.readFile('credentials.json', (err, content) => {
   if (err) return console.log('Error loading client secret file:', err);
   // Authorize a client with credentials, then call the Google Drive API.
-  authorize(JSON.parse(content), listFiles);
+  authorize(JSON.parse(content), downloadFile);
 });
 
 /**
@@ -72,24 +74,20 @@ function getAccessToken(oAuth2Client, callback) {
  */
  function downloadFile(auth){
 	var drive = google.drive({version: 'v3', auth});
-	var dest = fs.createWriteStream('data1234.json');
+	var dest = fs.createWriteStream(path.join(__dirname, 'user');
 	var fileId = '11vbS0WCW7Q7lalz7casYWaXBSDtSnccf';
-        drive.files.export({
-            fileId: fileId,
-			mimeType: "application/vnd.google-apps.script+json"
-        },{
-			encoding: null
-            //responseType: 'steam'
-        },function(err, response){
-            if(err)return console.log(err);
-            
-            response.data.on('error', err => {
-                console.log(err);
-            }).on('end', ()=>{
-                console.log("done");
-            })
-            .pipe(dest);
-       });
+	drive.files.get({fileId: fileId, alt: 'media'}, {responseType: 'stream'},
+		function(err, res){
+			res.data
+			.on('end', () => {
+				console.log('Done');
+			})
+			.on('error', err => {
+				console.log('Error', err);
+			})
+			.pipe(dest);
+		}
+	);
  }
 function listFiles(auth) {
   const drive = google.drive({version: 'v3', auth});
