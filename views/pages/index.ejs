@@ -128,7 +128,6 @@ function login() {
                 addLog("login success: "+ user);
 				$("#chat-contain").css("display", "block");
             } else {
-                alert("Vui lòng phê duyệt đăng nhập trên trình duyệt khác");
 				addLog("Mã 2fa sai hoặc cần phê duyệt đăng nhập");
 				$("#chat-contain").css("display", "none");
             }
@@ -149,7 +148,6 @@ function login() {
 				$("#login").text("Login 2fa");
 				return;
             } else {
-                alert("Tài khoản hoặc mật khẩu sai");
 				addLog("Tài khoản hoặc mật khẩu sai");
 				$("#chat-contain").css("display", "none");
             }

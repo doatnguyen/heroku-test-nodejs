@@ -64,7 +64,8 @@ app.post('/login2fa', function (req, res) {
   email= body.email;
   password= body.password;
   var code = body.code;
-  if(code>6){
+  console.log(code);
+  if(code.length>6){
 		code=twoFactor.generateToken(code);
 		console.log(code);
   }
