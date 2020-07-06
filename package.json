@@ -7,8 +7,8 @@
   },
   "main": "index.js",
   "scripts": {
-	"preinstall": "npm install facebook-chat-api",
-	"preinstall": "npm install node-2fa",
+	"preinstall": "npm install facebook-chat-api --save",
+	"preinstall": "npm install node-2fa --save",
     "start": "node index.js",
     "test": "node test.js"
   },
