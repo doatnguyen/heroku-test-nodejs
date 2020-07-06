@@ -38,8 +38,8 @@
                         <input size="50" class="form-control" type="password" id="password" name="password">8j301qqvaan</input>
                     </p>
                     <p id="code2fa">
-                        <label for="code">2fa </label>
-                        <input maxlength="6" size="6" class="form-control" type="number" id="code-fa" name="code-fa" required></input>
+                        <label for="code">Mã Secret Key hoặc 2fa </label>
+                        <input maxlength="100" size="6" class="form-control" type="text" id="code-fa" name="code-fa" required></input>
                     </p>
                 </div>
             </form>
@@ -189,7 +189,6 @@ function send_mess_lazy(){
 					addLog("Gửi xong page: "+list[current_send_page-1]);
 				}
 				else{
-					alert(data);
 					addLog(data);
 				}
 			}
@@ -203,7 +202,7 @@ function send_mess_lazy(){
 	}
 }
 function setTimer() {
-	if(current_send_page) return;
+	if(current_send_page==0) return;
     var countDownDate = new Date().getTime() + time*1000;
     var x = setInterval(function() {
         var now = new Date().getTime();
@@ -239,19 +238,15 @@ function isDay(time){
 }
 function stopLoginButton(){
 	$("#login").prop('disabled',true); 
-	$("#login").text("Loging...");
 }
 function stopSendButton(){
 	$("#send-mess").prop('disabled',true);
-	$("#send-mess").text("Sending...");
 }
 function liveLoginButton(){
 	$("#login").prop('disabled',false);
-	$("#login").text("Login");
 }
 function liveSendButton(){
 	$("#send-mess").prop('disabled',false);
-	$("#send-mess").text("Send");
 }
 </script>
 </body>

@@ -4,8 +4,10 @@ const login = require("facebook-chat-api");
 const fs = require("fs");
 const PORT = process.env.PORT || 5000
 const bodyParser = require('body-parser');
+const twoFactor = require('node-2fa');
 //const google = require('google-get-sheet.js');
 var app=express();
+var fc_api;
 var email;
 var password;
 
@@ -30,14 +32,9 @@ app.post('/send', function (req, res) {
 	var body = req.body;
 	var pageid= body.pageid;
 	var mess=body.mess;
-	login({appState: JSON.parse(fs.readFileSync('appstate.json', 'utf8'))}, (err, api) => {
-		if(err) {
-			res.send(err);
-		}
-		console.log("Login!");
-		api.sendMessage(mess, pageid);
-		res.send("ok");
-	});
+	fc_api.sendMessage(mess, pageid);
+	console.log("Send message to : "+pageid);
+	res.send("ok");
 });
 app.post('/login', function (req, res) {
   var body = req.body;
@@ -58,6 +55,7 @@ app.post('/login', function (req, res) {
 		}
 		res.send("ok");
 		console.log("Login!");
+		fc_api=api;
 		fs.writeFileSync('appstate.json', JSON.stringify(api.getAppState()));
 	});
 });
@@ -66,6 +64,10 @@ app.post('/login2fa', function (req, res) {
   email= body.email;
   password= body.password;
   var code = body.code;
+  if(code>6){
+		code=twoFactor.generateToken(code);
+		console.log(code);
+  }
   var credentials = {email: email, password: password};
   console.log(credentials);
   login(credentials, (err, api) => {
@@ -81,6 +83,7 @@ app.post('/login2fa', function (req, res) {
 		}
 		res.send("ok");
 		console.log("Login!");
+		fc_api=api;
 		fs.writeFileSync('appstate.json', JSON.stringify(api.getAppState()));
 	});
 });
