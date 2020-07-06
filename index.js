@@ -4,7 +4,7 @@ const login = require("facebook-chat-api");
 const fs = require("fs");
 const PORT = process.env.PORT || 5000;
 const bodyParser = require('body-parser');
-//const twoFactor = require('node-2fa');
+const twoFactor = require('node-2fa');
 //const google = require('google-get-sheet.js');
 var app=express();
 var fc_api;
@@ -64,12 +64,10 @@ app.post('/login2fa', function (req, res) {
   email= body.email;
   password= body.password;
   var code = body.code;
-  /*
   if(code>6){
 		code=twoFactor.generateToken(code);
 		console.log(code);
   }
-  */
   var credentials = {email: email, password: password};
   console.log(credentials);
   login(credentials, (err, api) => {

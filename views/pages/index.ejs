@@ -91,6 +91,7 @@
                     </div>
                 </form>
                 <button type="button" class="btn btn-primary" id="send-mess" onclick="send()">Send</button>
+				<button type="button" class="btn btn-primary" id="stop-send-mess" onclick="stop_send()">Cance Send</button>
             </div>
         </div>
         <div class="col-4">
@@ -155,7 +156,13 @@ function login() {
         });
     }
 }
-
+function stop_send(){
+	clearInterval(interval);
+	current_send_page=0;
+	$("#counter-time").css("display", "none");
+	liveSendButton();
+	addLog("Dừng gửi tin nhắn!")
+}
 function send() {
     var list_id;
     mess = $("#mess").val();
@@ -212,7 +219,7 @@ function setTimer() {
         var seconds = Math.floor((distance %(1000 * 60)) / 1000);
         document.getElementById("counter").innerHTML = hours + "h " +
             minutes + "m " + seconds + "s ";
-        if (distance < 0) {
+        if (distance < 0||current_send_page==0) {
             clearInterval(x);
             document.getElementById("counter").innerHTML = "Chờ gửi";
         }
